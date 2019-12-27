@@ -52,31 +52,193 @@ The data does not derive from an experiment with a randomized control group; so,
 
 ## Part 2: Research question
 
+**Question**:  Which variables in the "movies" data set are predictors for the general popularity of a movie?
+
+The website IMDb provides a rating as an aggregated score from 1 - 10 that is based on individual user votes.  The IMDb rating is not an arithmetic average, however, but a weighted average utilizing an undisclosed method of filtering and weighting with the effect that not all individual user scores have the same weight.  The Rotten Tomatoes audience score is the percentage of users who have rated the movie positively.  Each of these scoring methods provides a single number intended to measure the general popularity of a movie.  Many people find these measures useful for deciding whether to see a movie or not.
+
+The general popularity of a movie sometimes does not cohere with views about the movie by official movie critics.  However, critics are sometimes provided with early screenings and their reviews become available often before or concurrent with the official release of the movie, and thereby have the potential to influence the popular reception of a movie.  To what degree are critics' reviews associated with these measures of general popularity?
+
+As measures of general popularity, the IMDb rating and the Rotten Tomatoes audience score should be strongly correlated.  This will be checked. Then the `critics_score` variable from Rotten Tomatoes will be used to create a linear model for predicting both IMDb rating and the Rotten Tomatoes audience score. The effect of other variables will be considered following a forward selection strategy toward building the most effective and parsimonious models for predicting these two measures of general popularity.
 
 
 * * *
 
 ## Part 3: Exploratory data analysis
 
-NOTE: Insert code chunks as needed by clicking on the "Insert a new code chunk" 
-button above. Make sure that your code is visible in the project you submit. 
-Delete this note when before you submit your work.
+As shown below, the IMDb rating and the Rotten Tomatoes audience score are highly correlated.
+
+```{r}
+ggplot(data = movies, aes(x = audience_score, y = imdb_rating)) + 
+  geom_jitter() + 
+  stat_smooth(method = "lm", se = TRUE)
+```
+
+Fitting a linear model to `imdb_rating` versus `audience_score` yields a value for R-squared of 0.748 (shown below), implying a high correlation coefficient.  This R-squared value tells us that nearly three quarters of the variation in `imdb_rating` is accounted for by the `audience_score` value.  A linear model seems justified, since by observation of the scatterplot we can see that (a) there is a linear association, (b) the spread of points around the fitted line is nearly normal (with some slight skew toward the negative residuals), and (c) the variability appears nearly constant (with perhaps some tapering on the high end).  
+
+```{r}
+m_imdb_audience <- lm(imdb_rating ~ audience_score, data = movies)
+summary(m_imdb_audience)
+```
+
+What we have seen so far is that in `imdb_rating` and `audience_score` we have two highly correlated measures of the general popularity of a movie, as expected.  Although one might fairly well "predict" `imdb_rating` from `audience_score`, the practical usefulness of this arrangement is obviated by the fact that both variables develop as measures of general popularity in exactly the same time frame -- namely, after the theatrical release date.  What we seek are variables that one might have access to before `imdb_rating` and `audience_score` are available or have had sufficient time to develop. Since these two variables are highly correlated, for the remainder of this exploratory analysis, we will focus on the Rotten Tomatoes `audience_score`.  Insights gleaned are expected to apply to `imdb_rating` as well.
+
+One would expect there to be a positive correlation between the Rotten Tomatoes `critics_score` and `audience_score`.  We see that this is the case with a scatterplot and the fitted least-squares line.  
+
+```{r}
+ggplot(data = movies, aes(x = critics_score, y = audience_score)) + 
+  geom_jitter() + 
+  stat_smooth(method = "lm", se = TRUE)
+```
+
+Other kinds of data in the data set that one would have access to before the theatrical release date and which might provide some predictive power are the following: `title_type`, `genre`, `runtime`, `mpaa_rating`, `best_actor_win`, `best_actress_win`, and `best_dir_win`.  We examine these variables now to determine which to include in building a model.
+
+There are three values for the categorical variable `title_type`: Documentary, Feature Film, and TV Movie.  Side-by-side boxplots for these values show that the "Documentary" type is associated with higher audience scores; so, there might be some predictive power to be had there.  
+
+
+```{r}
+ggplot(data = movies, aes(x = title_type, y = audience_score)) + 
+  geom_boxplot(fill = "yellow")
+```
+
+Similarly, when one considers the categorical variable `genre`, one finds some values that are strongly associated with certain ranges of audience scores -- for example, "Animation", "Documentary", and "Musical & Performing Arts".
+
+```{r}
+ggplot(data = movies, aes(x = genre, y = audience_score)) + 
+  geom_boxplot(fill = "yellow") +
+  theme(axis.text.x= element_text(angle=90, hjust = 1, vjust = 0.5))
+```
+
+The category "Documentary" shows up as a value in both `title_type` and `genre`.  Clearly, documentaries are associated with higher audience scores.  A table breaking down `title_type` by `genre` shows that there is a significant overlap between the `title_type` "Documentary" and the `genre` "Documentary" values, although it is not a complete identity since there are three feature films that are also classified as documentaries by genre.  
+
+```{r}
+movies %>% 
+  group_by(title_type, genre) %>%
+  summarize(n())
+````
+
+This kind of overlap means that these two variables will be collinear to some degree.  So, for the purposes of model building we will employ the `genre` variable rather than the `title_type` variable in what follows.
+
+When it comes to `runtime`, we wouldn't expect runtime to be strongly associated with audience score and a look at a scatterplot confirms this, as shown below.  Although one can fit a linear model, there isn't an obvious linear relationship and the linear model violates the constant variability requirement.  The points are largely spread out evenly vertically rather than having a horizontal spread.  As such, the model is highly susceptible points of high leverage.  So, we will exclude `runtime` from model building.
+
+
+```{r}
+ggplot(data = movies, aes(x = runtime, y = audience_score)) + 
+  geom_point() + 
+  stat_smooth(method = "lm", se = TRUE)
+```
+
+
+When we consider `mpaa_rating`, we see that most values are not strongly associated with a specific range of `audience_score` with the exception of the NC-17 rating.
+
+```{r}
+ggplot(data = movies, aes(x = mpaa_rating, y = audience_score)) + 
+  geom_boxplot(fill = "yellow")
+```
+
+Finally, when we consider `best_actor_win`, `best_actress_win`, and `best_dir_win`, we don't see any strong association.  So, we expect that these categorical variables will not make much difference when included in a model.
+
+```{r}
+ggplot(data = movies, aes(x = best_actor_win, y = audience_score)) + 
+  geom_boxplot(fill = "yellow")
+```
+
+
+
+```{r}
+ggplot(data = movies, aes(x = best_actress_win, y = audience_score)) + 
+  geom_boxplot(fill = "yellow")
+```
+
+```{r}
+ggplot(data = movies, aes(x = best_dir_win, y = audience_score)) + 
+  geom_boxplot(fill = "yellow")
+```
+
+In summary, then, besides `critics_score`, we have seen that there might be some advantage to including in our model `genre` and `mpaa_rating`, although it is not so clear since only certain values of those categorical variables were strongly associated with particular ranges of audience score.
 
 * * *
 
 ## Part 4: Modeling
 
-NOTE: Insert code chunks as needed by clicking on the "Insert a new code chunk" 
-button above. Make sure that your code is visible in the project you submit. 
-Delete this note when before you submit your work.
+We will proceed to model `audience_core` by means of a forward model selection strategy.  Once completed, we will then see how the model performs for `imdb_rating`.  Our first model will include only `critics_score`.  This will establish a baseline.
+
+
+```{r}
+m_critics <- lm(audience_score ~ critics_score, data = movies)
+summary(m_critics)
+```
+
+We see that `critics_score` is significant with a very small p-value and that the adjusted R-squared obtained is 0.4952 which establishes a baseline for adjusted R-squared.
+
+As a check on our earlier decision not to include `best_actor_win`, `best_actress_win`, and `best_dir_win`, we can observe the impact of adding those variables to the model.  
+
+```{r}
+m_wins <- lm(audience_score ~ critics_score + best_actor_win + best_actress_win + best_dir_win, data = movies)
+summary(m_wins)
+```
+
+The added variables do not show up as statistically significant.  Plus, their addition does not increase, but rather decreases (with a value of 0.4933), adjusted R-squared.
+
+We see the same sort of effect when adding `mpaa_rating`.  None of the indicator variables created to capture the many values of the categorical variable `mpaa_rating` are significant.  Plus, with a value of 0.4946, the adjusted R-squared is not improved over our baseline of 0.4952.
+
+
+```{r}
+m_mpaa <- lm(audience_score ~ critics_score + mpaa_rating, data = movies)
+summary(m_mpaa)
+```
+
+When adding `genre`, there is some improvement obtained.  The adjusted R-squared increases slightly to 0.5197.  However, we note that only some of the indicator variables created to capture the values of the categorical variable `genre` are significant.
+
+```{r}
+m_genre <- lm(audience_score ~ critics_score + genre, data = movies)
+summary(m_genre)
+```
+
+We can try creating new single indicator variables -- `documantary`, `horror`, and `musical` -- based off the presence of particular values of the `genre` variable.
+
+```{r}
+movies <- movies %>%
+  mutate(documentary = ifelse(genre == "Documentary", "yes", "no")) %>%
+  mutate(horror = ifelse(genre == "Horror", "yes", "no")) %>%
+  mutate(musical = ifelse(genre == "Musical & Performing Arts", "yes", "no"))
+```
+
+```{r}
+m_doc <- lm(audience_score ~ critics_score + documentary, data = movies)
+summary(m_doc)
+```
+
+```{r}
+m_doc_hor <- lm(audience_score ~ critics_score + documentary + horror, data = movies)
+summary(m_doc_hor)
+```
+
+```{r}
+m_doc_hor_mus <- lm(audience_score ~ critics_score + documentary + horror + musical, data = movies)
+summary(m_doc_hor_mus)
+```
+
+
+```{r}
+m_imdb_crit <- lm(imdb_rating ~ critics_score, data = movies)
+summary(m_imdb_crit)
+```
+
+```{r}
+m_imdb_crit_plus <- lm(imdb_rating ~ critics_score + documentary + horror + musical, data = movies)
+summary(m_imdb_crit_plus)
+```
+
+
 
 * * *
 
 ## Part 5: Prediction
 
-NOTE: Insert code chunks as needed by clicking on the "Insert a new code chunk" 
-button above. Make sure that your code is visible in the project you submit. 
-Delete this note when before you submit your work.
+```{r}
+knives_out <- data.frame(critics_score = 96, documentary = "no", horror = "no", musical = "no")
+predict(m_doc_hor_mus, knives_out, interval = "prediction", level = 0.95)
+```
 
 * * *
 
