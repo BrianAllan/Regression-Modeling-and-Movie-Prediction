@@ -3,3 +3,5 @@ movies.gz
 reg_model_project_rubric.html
 reg_project_instructions.html
 reg_project_instructions.Rmd
+.RData
+.Rhistory
