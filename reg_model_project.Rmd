@@ -272,3 +272,6 @@ predict(m_doc_hor_mus, knives_out, interval = "prediction", level = 0.95)
 
 ## Part 6: Conclusion
 
+For the question --  Which variables in the "movies" data set are predictors for the general popularity of a movie? -- we settled upon the Rotten Tomatoes' audience score and the IMDb rating as representatives of general popularity.  These variables are highly correlated with one another.  To find predictors for these variables, we focused on Rotten Tomatoes' audience score.  We examined several candidates.  The obvious one was the Rotten Tomatoes' critics score.  In addition, whether or not a movie was a documentary, a horror, or fit in the genre "Musical & Performing Arts" also was significant and found to make a difference in adjusted R-squared.
+
+In making predictions, however, our final models have large uncertainties.  So, when using the models, the predictions are not that accurate.  Perhaps other variables not included in the data set might help -- for example, a more detailed categorization of genres.  A better grasp of how the critics score is determined might also help for making better predictions.  This would be something to possibly research further.
