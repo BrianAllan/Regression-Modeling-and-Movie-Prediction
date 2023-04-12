@@ -1,17 +1,28 @@
-## December 20, 2019
+## Multiple Linear Regression Modeling and Movie Prediction using Data from Rotten Tomatoes and IMDB
 
-## Coursera Regression Project
+### Project Description
 
-## Description
+This project was produced in 2019 for the course **"Linear Regression and Modeling"**, the third in the five course sequence of courses for the Coursera Specialization **Statistics with R** produced by Duke University.
 
-This project is for the course "Linear Regression and Modeling", the third in the five course sequence of courses for the Coursera Specialization "Statistics with R" produced by Duke University.
+Given a data set of movies released between the years 1970 to 2014, the aims of the project were to:
 
-A movies data set was provided by the course for the project.  The aim of the project is to come up with a research question, to perform an exploratory data analysis, to create a model, to make predictions using the model, and then to answer the initial research question.
+- develop a research question to answer using regression modeling in `R`
+- perform and document an exploratory data analysis (EDA) in an `R` Markdown file supported by numerical summaries and visualizations
+- develop a multiple linear regression model
+- pick a new movie not in the sample and use the model to make a prediction
 
-The data set is comprised of 651 randomly sampled movies, described by 32 variables.  The sources for the data set are the Rotten Tomatoes and IMDB APIs; URLs to both websites are provided for each movie in the data set.
+The data set (`movies.Rdata`) is comprised of 651 randomly sampled movies, described by 32 variables.  The sources for the data set are the Rotten Tomatoes and IMDB APIs; URLs to both websites are provided for each movie in the data set.
 
-## Files Used 
+Coding and documentation was to be done using `R` and an `R` Markdown file.
+
+
+
+### Files Used 
 
 reg_model_project.Rmd  
 reg_model_project.html   
 movies.Rdata   
+
+### Tools Used
+
+`R` with `ggplot2`, `dplyr`, and `statsr` libraries in RStudio.
