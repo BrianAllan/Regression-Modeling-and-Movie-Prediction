@@ -1,11 +1,16 @@
 ---
-title: "Modeling and prediction for movies"
+title: "Multiple Linear Regression Modeling and Movie Prediction using Data from Rotten Tomatoes and IMDB"
+author: "Brian Allan Woodcock"
 output: 
   html_document: 
     fig_height: 4
     highlight: pygments
     theme: spacelab
 ---
+
+**Note**: Created for the Coursera course **"Linear Regression and Modeling"** in the **_Statistics with R_** sequence by Duke University.
+
+***
 
 ## Setup
 
