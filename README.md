@@ -1,4 +1,4 @@
-## Multiple Linear Regression Modeling and Movie Prediction using Data from Rotten Tomatoes and IMDB
+## Multiple Linear Regression Modeling and Movie Prediction using Data from Rotten Tomatoes and IMDb
 
 ### Project Description
 
@@ -11,7 +11,7 @@ Given a data set of movies released between the years 1970 to 2014, the aims of 
 - develop a multiple linear regression model
 - pick a new movie not in the sample and use the model to make a prediction
 
-The data set (`movies.Rdata`) is comprised of 651 randomly sampled movies, described by 32 variables.  The sources for the data set are the Rotten Tomatoes and IMDB APIs; URLs to both websites are provided for each movie in the data set.
+The data set (`movies.Rdata`) supplied to the student was comprised of 651 randomly sampled movies, described by 32 variables.  The original sources for the data were the Rotten Tomatoes and IMDb APIs; URLs to both websites were provided for each movie in the data set.
 
 Coding and documentation were done using `R` and an `R` Markdown file to produce the [project report](https://brianallan.github.io/Regression-Modeling-and-Movie-Prediction/).
 
